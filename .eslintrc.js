@@ -15,19 +15,22 @@ module.exports = {
     },
   },
   env: {
-    es2021: true, // adds all ECMAScript 2020 globals and automatically sets the ecmaVersion parser option to 11.
     browser: true, // browser global variables.
+    es2021: true, // adds all ECMAScript 2020 globals and automatically sets the ecmaVersion parser option to 11.
     jest: true, // Jest global variables.
     node: true, // Node.js global variables and Node.js scoping.
   },
-  ignorePatterns: ['node_modules/*', '.next/*', '*.js'], // Ignore node_modules and .next generated files
-  plugins: ['@typescript-eslint', 'react', 'react-hooks', 'jsx-a11y', 'import', 'prettier'],
+  ignorePatterns: ['node_modules/*'], // Ignore node_modules and .next generated files
+  plugins: ['@typescript-eslint', 'import', 'jsx-a11y', 'prettier', 'react-hooks', 'react'],
   extends: [
-    // Uses the recommended rules from @eslint-plugin-react
-    'plugin:react/recommended',
-
     // Uses the recommended rules from the @typescript-eslint/eslint-plugin
     'plugin:@typescript-eslint/recommended',
+
+    // Uses rules from eslint-config-airbnb-typescript plugin
+    'airbnb-typescript',
+
+    // Uses the recommended rules from @eslint-plugin-react
+    'plugin:react/recommended',
 
     // This ESLint plugin enforces the Rules of Hooks.
     // https://reactjs.org/docs/hooks-rules.html
@@ -36,14 +39,16 @@ module.exports = {
     // Static AST checker for accessibility rules on JSX elements.
     // https://github.com/jsx-eslint/eslint-plugin-jsx-a11y
     'plugin:jsx-a11y/recommended',
-    'airbnb-typescript',
-    'prettier',
+
+    // Uses the all recommended rules from prettier plugin
+    // https://github.com/prettier/eslint-config-prettier/blob/main/CHANGELOG.md#version-800-2021-02-21
+    'plugin:prettier/recommended',
   ],
   rules: {
     /**
      * Prettier
      */
-
+    // Show prettier errors in eslint
     'prettier/prettier': ['error'],
 
     /**
@@ -58,11 +63,11 @@ module.exports = {
     // https://github.com/typescript-eslint/typescript-eslint/blob/master/packages/eslint-plugin/docs/rules/no-unused-vars.md
     '@typescript-eslint/no-unused-vars': process.env.NODE_ENV === 'production' ? 'error' : 'warn',
 
-    // Don't need to specify function return types
+    // Typescript is good in inferring return types, so there is no need to specify
     // https://github.com/typescript-eslint/typescript-eslint/blob/master/packages/eslint-plugin/docs/rules/explicit-module-boundary-types.md
     '@typescript-eslint/explicit-module-boundary-types': 'off',
 
-    // Don't need to specify function return types
+    // Typescript is good in inferring return types, so there is no need to specify
     // https://github.com/typescript-eslint/typescript-eslint/blob/master/packages/eslint-plugin/docs/rules/explicit-function-return-type.md
     '@typescript-eslint/explicit-function-return-type': 'off',
 
@@ -70,7 +75,11 @@ module.exports = {
     // https://github.com/typescript-eslint/typescript-eslint/blob/v4.26.1/packages/eslint-plugin/docs/rules/no-shadow.md
     '@typescript-eslint/no-shadow': ['off'],
 
-    // Enforces naming conventions for everything across a codebase
+    // Use consistent type definitions, prefer "type" over "interface"
+    // https://github.com/typescript-eslint/typescript-eslint/blob/master/packages/eslint-plugin/docs/rules/consistent-type-definitions.md
+    '@typescript-eslint/consistent-type-definitions': ['error', 'type'],
+
+    // Enforces naming conventions for everything across the codebase
     // https://github.com/typescript-eslint/typescript-eslint/blob/master/packages/eslint-plugin/docs/rules/naming-convention.md
     '@typescript-eslint/naming-convention': [
       'error',
@@ -131,6 +140,10 @@ module.exports = {
     // https://eslint.org/docs/rules/no-debugger
     'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'warn',
 
+    // Specify curly brace conventions for all control statements
+    // https://eslint.org/docs/rules/curly
+    curly: ['error', 'all'],
+
     // Enforce blank lines:
     // Before every return, case, default and try
     // After every const, let and var but not between each other
@@ -171,6 +184,7 @@ module.exports = {
           'multiline-const',
           'multiline-let',
           'multiline-var',
+          'export',
         ],
         next: '*',
       },
@@ -184,7 +198,7 @@ module.exports = {
     // https://github.com/yannickcr/eslint-plugin-react/blob/master/docs/rules/react-in-jsx-scope.md
     'react/react-in-jsx-scope': 'off',
 
-    // We don't use propTypes we use typed props instead
+    // We don't use propTypes we use typed props instead with Typescript
     // https://github.com/yannickcr/eslint-plugin-react/blob/master/docs/rules/prop-types.md
     'react/prop-types': 'off',
 
@@ -200,11 +214,27 @@ module.exports = {
     // https://github.com/yannickcr/eslint-plugin-react/blob/97a9f397d2a8a3ce3b2af893bdbb86bb2c1d4480/docs/rules/self-closing-comp.md
     'react/self-closing-comp': ['error', { component: true }],
 
+    // This formatting rule is handled by Prettier
+    // https://github.com/yannickcr/eslint-plugin-react/blob/master/docs/rules/jsx-wrap-multilines.md
+    'react/jsx-wrap-multilines': 'off',
+
+    // This formatting rule is handled by Prettier
+    // https://github.com/yannickcr/eslint-plugin-react/blob/master/docs/rules/jsx-curly-newline.md
+    'react/jsx-curly-newline': 'off',
+
+    // This formatting rule is handled by Prettier
+    // https://github.com/yannickcr/eslint-plugin-react/blob/master/docs/rules/jsx-one-expression-per-line.md
+    'react/jsx-one-expression-per-line': 'off',
+
+    // Not needed with Typescript
+    // https://github.com/yannickcr/eslint-plugin-react/blob/master/docs/rules/require-default-props.md
+    'react/require-default-props': 'off',
+
     /**
      * Import
      */
 
-    // Allow using named exports as single export
+    // Allow using named exports as single export, preferred way of exports
     'import/prefer-default-export': 'off',
 
     // Do not allow a default import name to match a named export
@@ -217,10 +247,39 @@ module.exports = {
 
     // Allow any order of import statements
     // https://github.com/benmosher/eslint-plugin-import/blob/master/docs/rules/order.md
-    'import/order': ['error', { groups: ['builtin', 'external'] }],
+    'import/order': [
+      'error',
+      {
+        alphabetize: { order: 'asc' },
+        groups: [
+          ['builtin', 'external'],
+          ['parent', 'sibling', 'index'],
+        ],
+        'newlines-between': 'always',
+      },
+    ],
 
     // Ensures that there is no resolvable path back to this module via its dependencies.
     // https://github.com/benmosher/eslint-plugin-import/blob/master/docs/rules/no-cycle.md
     'import/no-cycle': ['warn'],
+
+    // Allow devDependencies for following files and folders
+    // https://github.com/benmosher/eslint-plugin-import/blob/master/docs/rules/no-extraneous-dependencies.md
+    'import/no-extraneous-dependencies': [
+      'error',
+      {
+        devDependencies: [
+          '**/*.stories.tsx',
+          '**/*.test.{ts,tsx}',
+          '**/*.spec.{ts,tsx}',
+          '**/__tests__/**',
+          '**/__spec__/**',
+          '**/jest.config.{js,ts}',
+          '**/webpack.config.{js,ts}',
+          '**/webpack.config.*.{js,ts}',
+          '**/vite.config.{js,ts}',
+        ]
+      }
+    ]
   },
-}
+};
